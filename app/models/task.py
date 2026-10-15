@@ -7,14 +7,16 @@ class Task(db.Model):
     title: Mapped[str]
     description: Mapped[str]
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    is_complete: Mapped[bool] = mapped_column(nullable=True)
 
     def to_dict(self):
+        is_complete = False
+        if self.completed_at is not None:
+            is_complete = True
         return {
             "id" : self.id,
             "title" : self.title,
             "description" : self.description,
-            "is_complete" : False
+            "is_complete" : is_complete
         }
 
     @classmethod
@@ -22,7 +24,7 @@ class Task(db.Model):
         return cls(
             title = data["title"],
             description = data["description"],
-            is_complete = data["is_complete"]
+            completed_at = None
         )
         
 
