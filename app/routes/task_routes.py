@@ -5,6 +5,7 @@ from ..db import db
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
+
 @tasks_bp.post("")
 def create_task():
     try:
@@ -14,21 +15,22 @@ def create_task():
 
         return task.to_dict(), 201
     except KeyError:
-        return { "details": "Invalid data"}, 400
+        return {"details": "Invalid data"}, 400
+
 
 @tasks_bp.get("")
 def get_all_tasks():
     query = db.select(Task)
 
-    sort_param = request.args.get("sort")
-    if sort_param:
-        match sort_param:
-            case "asc":
-                query = query.order_by(Task.title.asc())
-            case "desc":
-                query=query.order_by(Task.title.desc())
-    else:
-        query = query.order_by(Task.id)
+    sort_param = request.args.get("sort", "").lower()
+
+    match sort_param:
+        case "asc":
+            query = query.order_by(Task.title.asc(), Task.id)
+        case "desc":
+            query = query.order_by(Task.title.desc(), Task.id)
+        case _:
+            query = query.order_by(Task.id)
 
     tasks = db.session.scalars(query)
 
@@ -38,20 +40,23 @@ def get_all_tasks():
 
     return tasks_response, 200
 
+
 @tasks_bp.get("/<task_id>")
 def get_one_task(task_id):
     return validate_task(task_id).to_dict()
 
+
 @tasks_bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_task(task_id)
-    request_body= request.get_json()
+    request_body = request.get_json()
 
     task.title = request_body["title"]
     task.description = request_body["description"]
     db.session.commit()
     return Response(status=204, mimetype="application/json")
-    
+
+
 @tasks_bp.delete("/<task_id>")
 def delete_task(task_id):
     task = validate_task(task_id)
@@ -59,6 +64,7 @@ def delete_task(task_id):
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
+
 
 def validate_task(task_id):
     try:
