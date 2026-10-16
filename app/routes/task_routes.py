@@ -1,4 +1,7 @@
-from flask import Blueprint, request, abort, make_response, Response
+from datetime import datetime
+
+from flask import Blueprint, Response, abort, make_response, request
+
 from app.models.task import Task
 
 from ..db import db
@@ -78,3 +81,20 @@ def validate_task(task_id):
     if not task:
         abort(make_response({"details": f"task {task_id} not found"}, 404))
     return task
+
+@tasks_bp.patch("/<task_id>/mark_complete")
+def mark_complete(task_id):
+    task = validate_task(task_id)
+
+    task.completed_at = datetime.now()
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
+
+
+@tasks_bp.patch("/<task_id>/mark_incomplete")
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+    
+    task.completed_at = None
+    db.session.commit()
+    return Response(status=204, mimetype="application/json")
