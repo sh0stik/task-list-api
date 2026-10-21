@@ -3,6 +3,9 @@ from .db import db, migrate
 from .models import task, goal
 import os
 from .routes.task_routes import tasks_bp
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_app(config=None):
     app = Flask(__name__)
