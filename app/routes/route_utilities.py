@@ -7,7 +7,7 @@ def validate_model(cls, model_id):
     try:
             model_id = int(model_id)
     except ValueError:
-        response = {"details": f"{cls.__name__.lower()}{model_id} invalid"}
+        response = {"details": f"{cls.__name__.lower()} {model_id} invalid"}
         abort(make_response(response , 400))
     
     query = db.select(cls).where(cls.id == model_id)
@@ -18,7 +18,7 @@ def validate_model(cls, model_id):
         abort(make_response(response, 404))
     return model
 
-def create_model_with_response(cls, model_data):
+def create_model(cls, model_data):
     try:
         new_model = cls.from_dict(model_data)
     except KeyError:

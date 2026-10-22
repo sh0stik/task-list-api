@@ -2,7 +2,7 @@ from flask import Blueprint, Response, abort, current_app, make_response, reques
 import requests
 
 from app.models.task import Task
-from .route_utilities import validate_model, create_model_with_response
+from .route_utilities import validate_model, create_model
 
 from app.models.goal import Goal
 
@@ -13,7 +13,7 @@ bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 @bp.post("")
 def create_goal():
-    return create_model_with_response(Goal, request.get_json())
+    return create_model(Goal, request.get_json())
 
 
 @bp.get("")

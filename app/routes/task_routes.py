@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import Blueprint, Response, abort, current_app, make_response, request
 import requests
-from .route_utilities import validate_model, create_model_with_response
+from .route_utilities import validate_model, create_model
 
 from app.models.task import Task
 
@@ -17,7 +17,7 @@ channel = os.environ.get('SLACKBOT_CHANNEL')
 
 @bp.post("")
 def create_task():
-    return create_model_with_response(Task, request.get_json())
+    return create_model(Task, request.get_json())
 
 @bp.get("")
 def get_all_tasks():
