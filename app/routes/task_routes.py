@@ -3,31 +3,23 @@ from datetime import datetime
 
 from flask import Blueprint, Response, abort, current_app, make_response, request
 import requests
-from .route_utilities import validate_model
+from .route_utilities import validate_model, create_model_with_response
 
 from app.models.task import Task
 
 from ..db import db
 
-tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 slack_url = "https://slack.com/api/chat.postMessage"
 token = os.environ.get('SLACKBOT_TOKEN')
 channel = os.environ.get('SLACKBOT_CHANNEL')
 
 
-@tasks_bp.post("")
+@bp.post("")
 def create_task():
-    try:
-        task = Task.from_dict(request.get_json())
-    except KeyError:
-        return {"details": "Invalid data"}, 400
+    return create_model_with_response(Task, request.get_json())
 
-    db.session.add(task)
-    db.session.commit()
-
-    return task.to_dict(), 201
-
-@tasks_bp.get("")
+@bp.get("")
 def get_all_tasks():
     query = db.select(Task)
 
@@ -50,12 +42,12 @@ def get_all_tasks():
     return tasks_response, 200
 
 
-@tasks_bp.get("/<task_id>")
+@bp.get("/<task_id>")
 def get_one_task(task_id):
     return validate_model(Task, task_id).to_dict()
 
 
-@tasks_bp.put("/<task_id>")
+@bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
@@ -66,7 +58,7 @@ def update_task(task_id):
     return Response(status=204, mimetype="application/json")
 
 
-@tasks_bp.delete("/<task_id>")
+@bp.delete("/<task_id>")
 def delete_task(task_id):
     task = validate_model(Task, task_id)
     db.session.delete(task)
@@ -74,7 +66,7 @@ def delete_task(task_id):
 
     return Response(status=204, mimetype="application/json")
 
-@tasks_bp.patch("/<task_id>/mark_complete")
+@bp.patch("/<task_id>/mark_complete")
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
 
@@ -101,7 +93,7 @@ def mark_complete(task_id):
     return Response(status=204, mimetype="application/json")
 
 
-@tasks_bp.patch("/<task_id>/mark_incomplete")
+@bp.patch("/<task_id>/mark_incomplete")
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)
     

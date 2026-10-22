@@ -2,7 +2,7 @@ from flask import Flask
 from .db import db, migrate
 from .models import task, goal
 import os
-from .routes.task_routes import tasks_bp
+from .routes import task_routes, goal_routes
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,6 +22,7 @@ def create_app(config=None):
     migrate.init_app(app, db)
 
     # Register Blueprints here
-    app.register_blueprint(tasks_bp)
+    app.register_blueprint(task_routes.bp)
+    app.register_blueprint(goal_routes.bp)
 
     return app
