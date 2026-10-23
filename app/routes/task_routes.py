@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import Blueprint, Response, abort, current_app, make_response, request
 import requests
-from .route_utilities import completed_at_parser, get_models_with_filters, validate_model, create_model
+from .route_utilities import completed_at_parser, delete_model, get_models_with_filters, validate_model, create_model
 
 from app.models.task import Task
 
@@ -49,11 +49,7 @@ def update_task(task_id):
 
 @bp.delete("/<task_id>")
 def delete_task(task_id):
-    task = validate_model(Task, task_id)
-    db.session.delete(task)
-    db.session.commit()
-
-    return Response(status=204, mimetype="application/json")
+    return delete_model(Task, task_id)
 
 
 @bp.patch("/<task_id>/mark_complete")

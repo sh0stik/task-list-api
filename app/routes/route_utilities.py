@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import abort, make_response, request
+from flask import Response, abort, make_response, request
 
 from ..db import db
 
@@ -61,3 +61,9 @@ def completed_at_parser(value):
     except (ValueError, TypeError):
         abort(make_response({"details": "Invalid date"}, 400))
 
+def delete_model(cls, model_id):
+    model = validate_model(cls, model_id)
+    db.session.delete(model)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
