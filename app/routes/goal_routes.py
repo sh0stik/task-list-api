@@ -2,7 +2,7 @@ from flask import Blueprint, Response, abort, current_app, make_response, reques
 import requests
 
 from app.models.task import Task
-from .route_utilities import validate_model, create_model
+from .route_utilities import get_models_with_filters, validate_model, create_model
 
 from app.models.goal import Goal
 
@@ -18,25 +18,7 @@ def create_goal():
 
 @bp.get("")
 def get_all_goals():
-    query = db.select(Goal)
-
-    sort_param = request.args.get("sort", "").lower()
-
-    match sort_param:
-        case "asc":
-            query = query.order_by(Goal.title.asc(), Goal.id)
-        case "desc":
-            query = query.order_by(Goal.title.desc(), Goal.id)
-        case _:
-            query = query.order_by(Goal.id)
-
-    goals = db.session.scalars(query)
-
-    goals_response = []
-    for goal in goals:
-        goals_response.append(goal.to_dict())
-
-    return goals_response, 200
+    return get_models_with_filters(Goal)
 
 
 @bp.get("/<goal_id>")

@@ -28,12 +28,13 @@ class Task(db.Model):
 
     @classmethod
     def from_dict(cls, task_data):
+        completed_at = task_data.get("completed_at")
         goal_id = task_data.get("goal_id")
 
         return cls(
             title = task_data["title"],
             description = task_data["description"],
-            completed_at = None,
+            completed_at = completed_at,
             goal_id = goal_id
         )
         
